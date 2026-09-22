@@ -1,0 +1,16 @@
+# Бинарники
+bin/
+netcheck
+
+# Тестовые данные
+testdata/*.pcap
+testdata/*.log
+
+# Конфиги
+*.local.json
+config.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
