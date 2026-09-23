@@ -23,5 +23,10 @@ func DiagnoseDNS(domain string) {
 		if badIps[ip] {
 			fmt.Printf("⚠️ Подмена DNS: %s\n", ip)
 		}
+		parsed := net.ParseIP(ip)
+		if parsed != nil && parsed.IsPrivate() {
+			fmt.Printf("⚠️ Приватный IP для публичного домена: %s (возможна подмена или локальная настройка)\n", ip)
+		}
 	}
+
 }
