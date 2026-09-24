@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/ImmortaL-jsdev/netcheck/internal/diagnose"
+	"github.com/ImmortaL-jsdev/netcheck/internal/proxy"
 )
 
 func main() {
@@ -47,6 +49,16 @@ func main() {
 	case "fix":
 		if len(os.Args) < 3 {
 			fmt.Println("usage: netcheck fix <domain>")
+			os.Exit(1)
+		}
+	case "serve":
+		addr := "127.0.0.1:8080"
+		resolver := func(domain string) ([]string, error) {
+			return diagnose.DiagnoseDoH(domain)
+		}
+		fmt.Println("Прокси запущен на", addr)
+		if err := proxy.Start(context.Background(), addr, resolver); err != nil {
+			fmt.Println("Ошибка прокси:", err)
 			os.Exit(1)
 		}
 	default:
