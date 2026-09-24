@@ -8,11 +8,22 @@ import (
 	"time"
 )
 
-func DiagnoseTLS(domain string) {
+const (
+	TLSStatusOK           = "ok"
+	TLSStatusTimeout      = "timeout"
+	TLSStatusReset        = "reset"
+	TLSStatusEOF          = "eof"
+	TLSStatusCert         = "certificate"
+	TLSStatusTCPFailed    = "tcp_failed"
+	TLSStatusOther        = "other"
+	TLSStatusNetworkError = "network_error"
+)
+
+func DiagnoseTLS(domain string) string {
 	conn, err := net.DialTimeout("tcp", domain+":443", 5*time.Second)
 	if err != nil {
 		fmt.Printf("❌ TCP: не удалось подключиться:%v\n", err)
-		return
+		return TLSStatusTCPFailed
 	}
 	defer conn.Close()
 
@@ -28,26 +39,27 @@ func DiagnoseTLS(domain string) {
 		errStr := err.Error()
 		if strings.Contains(errStr, "timeout") {
 			fmt.Println("⚠️ DPI: соединение зависло (timeout).")
-			return
+			return TLSStatusTimeout
 		}
 		if strings.Contains(errStr, "reset") {
 			fmt.Println("⚠️ DPI: соединение оборвано (SNI-фильтрация).")
-			return
+			return TLSStatusReset
 		}
 		if strings.Contains(errStr, "EOF") {
 			fmt.Println("⚠️ DPI: соединение закрыто после ClientHello.")
-			return
+			return TLSStatusEOF
 		}
 		if strings.Contains(errStr, "certificate") {
 			fmt.Println("❌ Проблема с сертификатом (не блокировка, но соединение небезопасно).")
-			return
+			return TLSStatusCert
 		}
 		if strings.Contains(errStr, "no route to host") || strings.Contains(errStr, "network is unreachable") {
 			fmt.Println("❌ Хост недоступен. Проверьте IP-адрес или сеть.")
-			return
+			return TLSStatusNetworkError
 		}
 		fmt.Printf("❌ TLS ошибка: %v\n", err)
-		return
+		return TLSStatusOther
 	}
 	fmt.Println("✅ TLS: рукопожатие успешно")
+	return TLSStatusOK
 }

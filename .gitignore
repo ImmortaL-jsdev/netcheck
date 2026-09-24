@@ -1,6 +1,6 @@
 # Бинарники
 bin/
-netcheck
+/netcheck
 
 # Тестовые данные
 testdata/*.pcap
