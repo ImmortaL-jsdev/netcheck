@@ -1,0 +1,6 @@
+github.com/shahradelahi/go-doh-client v0.0.0-20250817075312-7d03dda1da36 h1:NG0VhgeyvZq59ACloMbqai+e3ay2emD5wtS+e0hieDo=
+github.com/shahradelahi/go-doh-client v0.0.0-20250817075312-7d03dda1da36/go.mod h1:GUEFyiVNzVCNOJ8p3OpoFyb6XD38r1s+r0AV9iC4clQ=
+golang.org/x/net v0.43.0 h1:lat02VYK2j4aLzMzecihNvTlJNQUq316m2Mr9rnM6YE=
+golang.org/x/net v0.43.0/go.mod h1:vhO1fvI4dGsIjh73sWfUVjj3N7CA9WkKJNQm2svM6Jg=
+golang.org/x/text v0.28.0 h1:rhazDwis8INMIwQ4tpjLDzUhx6RlXqZNPEM0huQojng=
+golang.org/x/text v0.28.0/go.mod h1:U8nCwOR8jO/marOQ0QbDiOngZVEBB7MAiitBuMjXiNU=
