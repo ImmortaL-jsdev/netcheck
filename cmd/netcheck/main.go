@@ -7,6 +7,7 @@ import (
 
 	"github.com/ImmortaL-jsdev/netcheck/internal/diagnose"
 	"github.com/ImmortaL-jsdev/netcheck/internal/proxy"
+	"github.com/ImmortaL-jsdev/netcheck/internal/zapret"
 )
 
 func main() {
@@ -59,6 +60,36 @@ func main() {
 		fmt.Println("Прокси запущен на", addr)
 		if err := proxy.Start(context.Background(), addr, resolver); err != nil {
 			fmt.Println("Ошибка прокси:", err)
+			os.Exit(1)
+		}
+	case "zapret":
+		if len(os.Args) < 3 {
+			fmt.Println("usage: netcheck zapret <status>")
+			os.Exit(1)
+		}
+		subcommand := os.Args[2]
+		switch subcommand {
+		case "status":
+			z, err := zapret.Detect()
+			if err != nil {
+				fmt.Println("❌", err)
+				os.Exit(1)
+			}
+			fmt.Println("✅ Zapret найден:", z.Path)
+			fmt.Println("📦 Версия:", z.Version)
+			if z.IsRunning() {
+				fmt.Println("⚙️ Сервис: активен")
+			} else {
+				fmt.Println("⚙️ Сервис: остановлен")
+			}
+
+			if z.HasBinary("nfqws") {
+				fmt.Println("📁 nfqws: ✅")
+			} else {
+				fmt.Println("📁 nfqws: ❌")
+			}
+		default:
+			fmt.Println("unknown zapret subcommand:", subcommand)
 			os.Exit(1)
 		}
 	default:

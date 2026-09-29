@@ -3,12 +3,16 @@ package proxy
 import (
 	"bufio"
 	"context"
+	_ "embed"
 	"fmt"
 	"io"
 	"net"
 	"strings"
 	"time"
 )
+
+//go:embed fakes/tls_clienthello_www_google_com.bin
+var fakeClientHello []byte
 
 func Start(ctx context.Context, addr string, resolver func(string) ([]string, error)) error {
 	listener, err := net.Listen("tcp", addr)
@@ -126,21 +130,19 @@ func handleConnection(clientConn net.Conn, resolver func(string) ([]string, erro
 		_ = tcpConn.SetNoDelay(true)
 	}
 
-	chunkSize := 5
-	if tcpConn, ok := serverConn.(*net.TCPConn); ok {
-		_ = tcpConn.SetNoDelay(true)
-	}
-
-	for i := 0; i < len(data); i += chunkSize {
-		end := i + chunkSize
-		if end > len(data) {
-			end = len(data)
+	if len(fakeClientHello) > 0 {
+		fmt.Printf("Фейк: %d байт x11\n", len(fakeClientHello))
+		for i := 0; i < 11; i++ {
+			_, _ = serverConn.Write(fakeClientHello)
+			time.Sleep(5 * time.Millisecond)
 		}
-		_, _ = serverConn.Write(data[i:end])
-		time.Sleep(20 * time.Millisecond)
 	}
 
-	fmt.Printf("Multisplit: %d фрагментов\n", len(data)/chunkSize+1)
+	mid := len(data) / 2
+	_, _ = serverConn.Write(data[:mid])
+	time.Sleep(20 * time.Millisecond)
+	_, _ = serverConn.Write(data[mid:])
+	fmt.Println("Фейк + split2 отправлены")
 
 	go func() {
 		_, _ = io.Copy(serverConn, reader)
